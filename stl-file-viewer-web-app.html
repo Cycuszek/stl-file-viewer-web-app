@@ -369,17 +369,6 @@
         <div class="btn-label">Zapisz</div>
       </div>
 
-      <div class="btn-container">
-        <button class="btn" id="grid-btn" title="Toggle Grid">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M3 3v18h18V3H3zm16 16H5V5h14v14zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h10v2H7v-2z"
-            ></path>
-          </svg>
-        </button>
-        <div class="btn-label">Grid</div>
-      </div>
-
       <div class="slider-container">
         <input
           type="range"
@@ -389,7 +378,7 @@
           class="slider"
           id="scale-slider"
         />
-        <div class="slider-label">Skala</div>
+        <div class="slider-label">Scale</div>
         <div id="scale-value">100%</div>
       </div>
 
@@ -403,6 +392,16 @@
         </button>
         <div class="btn-label">Kolor</div>
       </div>
+
+      <div class="btn-container">
+        <button class="btn" id="grid-btn" title="Toggle Grid">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M3 3v18h18V3H3zm16 16H5V5h14v14zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h10v2H7v-2z"
+            ></path>
+          </svg>
+        </button>
+        <div class="btn-label">Grid</div>
     </div>
 
     <div id="color-picker-container">
@@ -433,6 +432,7 @@
       let modelGeometry; // Przechowuje geometrię do ponownego użycia przy zmianie koloru
       let currentColor = 0x3498db; // Domyślny kolor (niebieski)
       let originalScale = 1; // Oryginalna skala modelu
+      let gridHelper; // Dodajemy deklarację gridHelper
 
       const dropzone = document.getElementById("dropzone");
       const fileInput = document.getElementById("file-input");
@@ -485,7 +485,7 @@
         scene.add(directionalLight2);
 
         // Dodaj siatkę pomocniczą
-        const gridHelper = new THREE.GridHelper(10, 10);
+        gridHelper = new THREE.GridHelper(10, 10);
         gridHelper.visible = true; // Włącz siatkę domyślnie
         scene.add(gridHelper);
 
