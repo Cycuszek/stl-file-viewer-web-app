@@ -219,25 +219,25 @@
         align-items: center;
       }
 
-      #color-wheel {
+      #color-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
         width: 200px;
-        height: 200px;
         margin-bottom: 20px;
-        border-radius: 50%;
-        background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
-        position: relative;
-        cursor: pointer;
       }
 
-      #color-inner {
-        position: absolute;
-        width: 70%;
-        height: 70%;
-        top: 15%;
-        left: 15%;
-        border-radius: 50%;
-        background: white;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) inset;
+      .color-swatch {
+        width: 40px;
+        height: 40px;
+        border: 2px solid #eee;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .color-swatch:hover {
+        transform: scale(1.1);
       }
 
       #color-preview {
@@ -344,7 +344,7 @@
       <div id="dropzone">
         <div id="dropzone-icon">📁</div>
         <h2>Drag and drop STL</h2>
-        <p>or click, choose file</p>
+        <p>or click and choose file.</p>
         <input
           type="file"
           id="file-input"
@@ -406,8 +406,19 @@
 
     <div id="color-picker-container">
       <div id="color-picker">
-        <div id="color-wheel">
-          <div id="color-inner"></div>
+        <div id="color-grid">
+          <div class="color-swatch" style="background-color: #ff0000;"></div>
+          <div class="color-swatch" style="background-color: #00ff00;"></div>
+          <div class="color-swatch" style="background-color: #0000ff;"></div>
+          <div class="color-swatch" style="background-color: #ffff00;"></div>
+          <div class="color-swatch" style="background-color: #ff00ff;"></div>
+          <div class="color-swatch" style="background-color: #00ffff;"></div>
+          <div class="color-swatch" style="background-color: #ffa500;"></div>
+          <div class="color-swatch" style="background-color: #800080;"></div>
+          <div class="color-swatch" style="background-color: #008000;"></div>
+          <div class="color-swatch" style="background-color: #000080;"></div>
+          <div class="color-swatch" style="background-color: #808080;"></div>
+          <div class="color-swatch" style="background-color: #ffffff;"></div>
         </div>
         <div id="color-preview"></div>
         <button id="close-color-picker">Zastosuj</button>
@@ -713,37 +724,22 @@
         colorPickerContainer.classList.remove("active");
       });
 
-      colorWheel.addEventListener("click", (e) => {
-        if (e.target === colorWheel.querySelector("#color-inner")) return;
+      const colorGrid = document.getElementById("color-grid");
+      colorGrid.addEventListener("click", (e) => {
+        if (e.target.classList.contains("color-swatch")) {
+          const selectedColor = e.target.style.backgroundColor;
+          colorPreview.style.backgroundColor = selectedColor;
+          
+          // Convert RGB to hex
+          const rgb = selectedColor.match(/\d+/g);
+          currentColor = (parseInt(rgb[0]) << 16) |
+                        (parseInt(rgb[1]) << 8) |
+                        parseInt(rgb[2]);
 
-        // Pobierz pozycję kliknięcia względem koła
-        const rect = colorWheel.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-
-        // Oblicz kąt (hue) na podstawie pozycji kliknięcia
-        let angle = Math.atan2(y, x);
-        if (angle < 0) angle += 2 * Math.PI;
-        const hue = angle / (2 * Math.PI);
-
-        // Oblicz nasycenie na podstawie odległości od środka
-        const distance = Math.sqrt(x * x + y * y);
-        const maxDistance = rect.width / 2;
-        const saturation = Math.min(distance / maxDistance, 1);
-
-        // Konwertuj HSV na RGB
-        const color = hsvToRgb(hue, saturation, 1);
-        const hexColor = rgbToHex(color.r, color.g, color.b);
-
-        // Zastosuj kolor do podglądu
-        colorPreview.style.backgroundColor = hexColor;
-
-        // Konwertuj na format three.js
-        currentColor = parseInt(hexColor.substring(1), 16);
-
-        // Zastosuj kolor do modelu
-        if (model) {
-          model.material.color.setHex(currentColor);
+          // Apply color to model
+          if (model) {
+            model.material.color.setHex(currentColor);
+          }
         }
       });
 
