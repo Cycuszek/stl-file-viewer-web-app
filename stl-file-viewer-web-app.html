@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Przeglądarka STL</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        overflow: hidden;
+        display: flex;
+        height: 100vh;
+        background-color: #f5f5f5;
+      }
+
+      #left-panel {
+        width: 80px;
+        background-color: #333;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+      }
+
+      #container {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+      }
+
+      #right-panel {
+        width: 90px;
+        background-color: #333;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        overflow: hidden;
+      }
+
+      .btn-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 10px 0;
+      }
+
+      .btn {
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 8px;
+        background-color: #555;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s;
+        margin-bottom: 5px;
+      }
+
+      .btn:hover {
+        background-color: #777;
+      }
+
+      .btn svg {
+        width: 24px;
+        height: 24px;
+        fill: white;
+      }
+
+      .btn-label {
+        color: #aaa;
+        font-size: 10px;
+        text-align: center;
+      }
+
+      #dropzone {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.8);
+        border: 3px dashed #ccc;
+        z-index: 10;
+        transition: all 0.3s;
+        color: #555;
+        text-align: center;
+      }
+
+      #dropzone.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #dropzone.highlight {
+        background-color: rgba(200, 230, 255, 0.8);
+        border-color: #3498db;
+      }
+
+      #dropzone-icon {
+        font-size: 48px;
+        margin-bottom: 20px;
+      }
+
+      canvas {
+        display: block;
+      }
+
+      .info-text {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        color: #888;
+        font-size: 12px;
+        z-index: 5;
+      }
+
+      .slider-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 60px;
+        height: 180px;
+        margin: 10px 0 20px;
+        justify-content: flex-start;
+        position: relative;
+        overflow: visible;
+      }
+
+      .slider-label {
+        color: #aaa;
+        font-size: 10px;
+        margin: 5px 0 0 0;
+        text-align: center;
+        order: 2;
+      }
+
+      #scale-value {
+        color: #aaa;
+        font-size: 10px;
+        margin: 2px 0 0 0;
+        text-align: center;
+        order: 3;
+      }
+
+      .slider {
+        -webkit-appearance: none;
+        width: 120px;
+        height: 8px;
+        border-radius: 4px;
+        background: #555;
+        outline: none;
+        margin: 0 auto 5px;
+        transform: rotate(-90deg) translate(-50px, 30px);
+        transform-origin: left;
+        position: absolute;
+        top: 20px;
+      }
+
+      .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #4caf50;
+        cursor: pointer;
+      }
+
+      .slider::-moz-range-thumb {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: #4caf50;
+        cursor: pointer;
+      }
+
+      #color-picker-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+      }
+
+      #color-picker-container.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      #color-picker {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #color-wheel {
+        width: 200px;
+        height: 200px;
+        margin-bottom: 20px;
+        border-radius: 50%;
+        background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
+        position: relative;
+        cursor: pointer;
+      }
+
+      #color-inner {
+        position: absolute;
+        width: 70%;
+        height: 70%;
+        top: 15%;
+        left: 15%;
+        border-radius: 50%;
+        background: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) inset;
+      }
+
+      #color-preview {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 3px solid #eee;
+        margin-bottom: 15px;
+      }
+
+      #close-color-picker {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s;
+      }
+
+      #close-color-picker:hover {
+        background: #2980b9;
+      }
+
+      #scale-value {
+        color: #aaa;
+        font-size: 10px;
+        margin-top: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="left-panel">
+      <div class="btn-container">
+        <button class="btn" id="open-file" title="Otwórz nowy plik STL">
+          <svg viewBox="0 0 24 24">
+            <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"></path>
+          </svg>
+        </button>
+        <div class="btn-label">Otwórz</div>
+      </div>
+
+      <div class="btn-container">
+        <button class="btn" id="view-front" title="Widok z przodu">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 5l-7 7 7 7 7-7z"></path>
+          </svg>
+        </button>
+        <div class="btn-label">Przód</div>
+      </div>
+
+      <div class="btn-container">
+        <button class="btn" id="view-top" title="Widok z góry">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 12l7-7 7 7-7 7z"></path>
+          </svg>
+        </button>
+        <div class="btn-label">Góra</div>
+      </div>
+
+      <div class="btn-container">
+        <button class="btn" id="view-right" title="Widok z prawej">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 5l7 7-7 7-7-7z"></path>
+          </svg>
+        </button>
+        <div class="btn-label">Prawa</div>
+      </div>
+
+      <div class="btn-container">
+        <button class="btn" id="view-back" title="Widok z tyłu">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 19l-7-7 7-7 7 7z"></path>
+          </svg>
+        </button>
+        <div class="btn-label">Tył</div>
+      </div>
+
+      <div class="btn-container">
+        <button class="btn" id="view-left" title="Widok z lewej">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 5l-7 7 7 7 7-7z"></path>
+          </svg>
+        </button>
+        <div class="btn-label">Lewa</div>
+      </div>
+
+      <div class="btn-container">
+        <button class="btn" id="view-bottom" title="Widok z dołu">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 12l-7 7-7-7 7-7z"></path>
+          </svg>
+        </button>
+        <div class="btn-label">Dół</div>
+      </div>
+    </div>
+
+    <div id="container">
+      <div id="dropzone">
+        <div id="dropzone-icon">📁</div>
+        <h2>Przeciągnij i upuść plik STL</h2>
+        <p>lub kliknij, aby wybrać plik</p>
+        <input
+          type="file"
+          id="file-input"
+          accept=".stl"
+          style="display: none"
+        />
+      </div>
+      <div class="info-text">
+        Użyj myszy, aby obracać model. Kółko myszy, aby przybliżyć/oddalić.
+      </div>
+    </div>
+
+    <div id="right-panel">
+      <div class="btn-container">
+        <button class="btn" id="save-jpg" title="Zapisz jako JPG">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M5 4h14c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm2 14h10l-3.5-4.5-2.5 3.01L8.5 13 7 14.5z"
+            ></path>
+          </svg>
+        </button>
+        <div class="btn-label">Zapisz</div>
+      </div>
+
+      <div class="slider-container">
+        <input
+          type="range"
+          min="10"
+          max="300"
+          value="100"
+          class="slider"
+          id="scale-slider"
+        />
+        <div class="slider-label">Skala</div>
+        <div id="scale-value">100%</div>
+      </div>
+
+      <div class="btn-container">
+        <button class="btn" id="color-btn" title="Zmień kolor modelu">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"
+            ></path>
+          </svg>
+        </button>
+        <div class="btn-label">Kolor</div>
+      </div>
+    </div>
+
+    <div id="color-picker-container">
+      <div id="color-picker">
+        <div id="color-wheel">
+          <div id="color-inner"></div>
+        </div>
+        <div id="color-preview"></div>
+        <button id="close-color-picker">Zastosuj</button>
+      </div>
+    </div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.159.0/three.module.min.js"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.159.0/examples/jsm/controls/OrbitControls.js";
+      import { STLLoader } from "https://cdn.jsdelivr.net/npm/three@0.159.0/examples/jsm/loaders/STLLoader.js";
+
+      let scene, camera, renderer, controls, model;
+      let isModelLoaded = false;
+      let modelGeometry; // Przechowuje geometrię do ponownego użycia przy zmianie koloru
+      let currentColor = 0x3498db; // Domyślny kolor (niebieski)
+      let originalScale = 1; // Oryginalna skala modelu
+
+      const dropzone = document.getElementById("dropzone");
+      const fileInput = document.getElementById("file-input");
+      const container = document.getElementById("container");
+      const scaleSlider = document.getElementById("scale-slider");
+      const scaleValue = document.getElementById("scale-value");
+      const colorBtn = document.getElementById("color-btn");
+      const colorPickerContainer = document.getElementById(
+        "color-picker-container"
+      );
+      const colorWheel = document.getElementById("color-wheel");
+      const colorPreview = document.getElementById("color-preview");
+      const closeColorPicker = document.getElementById("close-color-picker");
+
+      // Inicjalizacja Three.js
+      function init() {
+        // Utwórz scenę
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf0f0f0);
+
+        // Utwórz kamerę
+        camera = new THREE.PerspectiveCamera(
+          75,
+          container.clientWidth / container.clientHeight,
+          0.1,
+          1000
+        );
+        camera.position.z = 5;
+
+        // Utwórz renderer
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        // Dodaj kontrolki orbity
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.25;
+
+        // Dodaj oświetlenie
+        const ambientLight = new THREE.AmbientLight(0x888888);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(1, 1, 1);
+        scene.add(directionalLight);
+
+        const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+        directionalLight2.position.set(-1, -1, -1);
+        scene.add(directionalLight2);
+
+        // Dodaj siatkę pomocniczą
+        const gridHelper = new THREE.GridHelper(10, 10);
+        scene.add(gridHelper);
+
+        window.addEventListener("resize", onWindowResize);
+
+        animate();
+      }
+
+      function onWindowResize() {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+
+      // Obsługa przeciągania i upuszczania plików
+      dropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add("highlight");
+      });
+
+      dropzone.addEventListener("dragleave", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove("highlight");
+      });
+
+      dropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove("highlight");
+
+        if (e.dataTransfer.files.length > 0) {
+          const file = e.dataTransfer.files[0];
+          if (file.name.toLowerCase().endsWith(".stl")) {
+            loadSTL(file);
+          } else {
+            alert("Proszę wybrać plik STL");
+          }
+        }
+      });
+
+      dropzone.addEventListener("click", () => {
+        fileInput.click();
+      });
+
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files.length > 0) {
+          const file = e.target.files[0];
+          if (file.name.toLowerCase().endsWith(".stl")) {
+            loadSTL(file);
+          } else {
+            alert("Proszę wybrać plik STL");
+          }
+        }
+      });
+
+      // Przycisk otwierania nowego pliku
+      document.getElementById("open-file").addEventListener("click", () => {
+        fileInput.click();
+      });
+
+      // Załaduj model STL
+      function loadSTL(file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const loader = new STLLoader();
+          const geometry = loader.parse(e.target.result);
+          modelGeometry = geometry; // Zapisz geometrię
+
+          // Usuń poprzedni model, jeśli istnieje
+          if (model) {
+            scene.remove(model);
+          }
+
+          // Utwórz nowy materiał i model
+          const material = new THREE.MeshPhongMaterial({
+            color: currentColor,
+            specular: 0x111111,
+            shininess: 200,
+          });
+          model = new THREE.Mesh(geometry, material);
+
+          // Wyśrodkuj model w poziomie
+          geometry.computeBoundingBox();
+          const box = geometry.boundingBox;
+          const centerX = (box.max.x + box.min.x) / 2;
+          const centerZ = (box.max.z + box.min.z) / 2;
+
+          // Ustaw model na poziomie siatki (dolna część modelu dotyka siatki)
+          model.position.set(-centerX, -box.min.y, -centerZ);
+
+          // Reset skali
+          scaleSlider.value = 100;
+          scaleValue.textContent = "100%";
+          model.scale.set(1, 1, 1);
+          originalScale = 1;
+
+          // Dostosuj kamerę do modelu
+          const maxDim = Math.max(
+            box.max.x - box.min.x,
+            box.max.y - box.min.y,
+            box.max.z - box.min.z
+          );
+          const fov = camera.fov * (Math.PI / 180);
+          let cameraZ = Math.abs(maxDim / Math.sin(fov / 2));
+          cameraZ *= 1.5; // Dodatkowy margines
+
+          // Ustaw kamerę nieco powyżej modelu
+          camera.position.set(cameraZ * 0.5, cameraZ * 0.5, cameraZ);
+
+          camera.updateProjectionMatrix();
+          controls.target.set(0, (box.max.y - box.min.y) / 2, 0); // Punkt skupienia kamery na środku wysokości modelu
+          controls.update();
+
+          scene.add(model);
+
+          // Ukryj strefę upuszczania
+          dropzone.classList.add("hidden");
+          isModelLoaded = true;
+        };
+        reader.readAsArrayBuffer(file);
+      }
+
+      // Funkcje widoków kamery
+      document.getElementById("view-front").addEventListener("click", () => {
+        if (!isModelLoaded) return;
+        positionCamera(0, 0, 1);
+      });
+
+      document.getElementById("view-back").addEventListener("click", () => {
+        if (!isModelLoaded) return;
+        positionCamera(0, 0, -1);
+      });
+
+      document.getElementById("view-left").addEventListener("click", () => {
+        if (!isModelLoaded) return;
+        positionCamera(-1, 0, 0);
+      });
+
+      document.getElementById("view-right").addEventListener("click", () => {
+        if (!isModelLoaded) return;
+        positionCamera(1, 0, 0);
+      });
+
+      document.getElementById("view-top").addEventListener("click", () => {
+        if (!isModelLoaded) return;
+        positionCamera(0, 1, 0);
+      });
+
+      document.getElementById("view-bottom").addEventListener("click", () => {
+        if (!isModelLoaded) return;
+        positionCamera(0, -1, 0);
+      });
+
+      function positionCamera(x, y, z) {
+        // Zachowaj dystans kamery od centrum
+        const distance = camera.position.length();
+        camera.position.set(x, y, z).normalize().multiplyScalar(distance);
+        controls.update();
+      }
+
+      // Zapisz jako JPG
+      document.getElementById("save-jpg").addEventListener("click", () => {
+        if (!isModelLoaded) {
+          alert("Najpierw załaduj model STL");
+          return;
+        }
+
+        renderer.render(scene, camera);
+        const dataURL = renderer.domElement.toDataURL("image/jpeg");
+
+        const link = document.createElement("a");
+        link.href = dataURL;
+        link.download = "model-stl.jpg";
+        link.click();
+      });
+
+      // Skalowanie modelu
+      scaleSlider.addEventListener("input", () => {
+        if (!isModelLoaded) return;
+
+        const scalePercent = parseInt(scaleSlider.value);
+        const scaleFactor = scalePercent / 100;
+
+        // Calculate current bottom position
+        const box = modelGeometry.boundingBox;
+        const currentBottom = -box.min.y * model.scale.y;
+
+        // Apply new scale
+        model.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+        // Adjust position to keep bottom on grid
+        model.position.y = -box.min.y * scaleFactor;
+
+        scaleValue.textContent = scalePercent + "%";
+      });
+
+      // Obsługa koła kolorów
+      colorBtn.addEventListener("click", () => {
+        if (!isModelLoaded) {
+          alert("Najpierw załaduj model STL");
+          return;
+        }
+
+        colorPickerContainer.classList.add("active");
+        // Ustaw podgląd koloru na aktualny kolor modelu
+        colorPreview.style.backgroundColor =
+          "#" + currentColor.toString(16).padStart(6, "0");
+      });
+
+      closeColorPicker.addEventListener("click", () => {
+        colorPickerContainer.classList.remove("active");
+      });
+
+      colorWheel.addEventListener("click", (e) => {
+        if (e.target === colorWheel.querySelector("#color-inner")) return;
+
+        // Pobierz pozycję kliknięcia względem koła
+        const rect = colorWheel.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+
+        // Oblicz kąt (hue) na podstawie pozycji kliknięcia
+        let angle = Math.atan2(y, x);
+        if (angle < 0) angle += 2 * Math.PI;
+        const hue = angle / (2 * Math.PI);
+
+        // Oblicz nasycenie na podstawie odległości od środka
+        const distance = Math.sqrt(x * x + y * y);
+        const maxDistance = rect.width / 2;
+        const saturation = Math.min(distance / maxDistance, 1);
+
+        // Konwertuj HSV na RGB
+        const color = hsvToRgb(hue, saturation, 1);
+        const hexColor = rgbToHex(color.r, color.g, color.b);
+
+        // Zastosuj kolor do podglądu
+        colorPreview.style.backgroundColor = hexColor;
+
+        // Konwertuj na format three.js
+        currentColor = parseInt(hexColor.substring(1), 16);
+
+        // Zastosuj kolor do modelu
+        if (model) {
+          model.material.color.setHex(currentColor);
+        }
+      });
+
+      // Konwersja HSV na RGB
+      function hsvToRgb(h, s, v) {
+        let r, g, b;
+        const i = Math.floor(h * 6);
+        const f = h * 6 - i;
+        const p = v * (1 - s);
+        const q = v * (1 - f * s);
+        const t = v * (1 - (1 - f) * s);
+
+        switch (i % 6) {
+          case 0:
+            r = v;
+            g = t;
+            b = p;
+            break;
+          case 1:
+            r = q;
+            g = v;
+            b = p;
+            break;
+          case 2:
+            r = p;
+            g = v;
+            b = t;
+            break;
+          case 3:
+            r = p;
+            g = q;
+            b = v;
+            break;
+          case 4:
+            r = t;
+            g = p;
+            b = v;
+            break;
+          case 5:
+            r = v;
+            g = p;
+            b = q;
+            break;
+        }
+
+        return {
+          r: Math.floor(r * 255),
+          g: Math.floor(g * 255),
+          b: Math.floor(b * 255),
+        };
+      }
+
+      // Konwersja RGB na HEX
+      function rgbToHex(r, g, b) {
+        return (
+          "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
+        );
+      }
+
+      // Zainicjuj aplikację
+      init();
+    </script>
+  </body>
+</html>
