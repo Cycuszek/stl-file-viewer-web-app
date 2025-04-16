@@ -673,6 +673,7 @@
       // Obsługa przycisku siatki
       document.getElementById("grid-btn").addEventListener("click", () => {
         gridHelper.visible = !gridHelper.visible;
+        console.log("Grid visibility:", gridHelper.visible); // Dodaj logowanie dla debugowania
       });
 
       // Skalowanie modelu
