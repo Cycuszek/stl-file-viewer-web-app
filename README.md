@@ -2,6 +2,9 @@
 
 This is a web-based application for viewing STL (Stereolithography) files. It allows users to load STL files, view them in 3D, and interact with the model using various controls.
 
+![obraz](https://github.com/user-attachments/assets/4d0a4e0a-7b74-4ac5-8ef2-0645c229b44d)
+
+
 ## Features
 
 - Load STL files by dragging and dropping or using the file input
