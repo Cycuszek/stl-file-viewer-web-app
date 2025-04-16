@@ -268,6 +268,10 @@
         font-size: 10px;
         margin-top: 3px;
       }
+
+      #grid-btn {
+        margin-top: 10px;
+      }
     </style>
   </head>
   <body>
@@ -363,6 +367,17 @@
           </svg>
         </button>
         <div class="btn-label">Zapisz</div>
+      </div>
+
+      <div class="btn-container">
+        <button class="btn" id="grid-btn" title="Toggle Grid">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M3 3v18h18V3H3zm16 16H5V5h14v14zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h10v2H7v-2z"
+            ></path>
+          </svg>
+        </button>
+        <div class="btn-label">Grid</div>
       </div>
 
       <div class="slider-container">
@@ -471,6 +486,7 @@
 
         // Dodaj siatkę pomocniczą
         const gridHelper = new THREE.GridHelper(10, 10);
+        gridHelper.visible = true; // Włącz siatkę domyślnie
         scene.add(gridHelper);
 
         window.addEventListener("resize", onWindowResize);
@@ -652,6 +668,11 @@
         link.href = dataURL;
         link.download = "model-stl.jpg";
         link.click();
+      });
+
+      // Obsługa przycisku siatki
+      document.getElementById("grid-btn").addEventListener("click", () => {
+        gridHelper.visible = !gridHelper.visible;
       });
 
       // Skalowanie modelu
