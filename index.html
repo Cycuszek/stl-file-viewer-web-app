@@ -549,7 +549,7 @@
             value="100"
             id="scale-slider"
           />
-          <div id="scale-value">100%</div>
+          <div id="scale-value">Scale: 100%</div>
         </div>
         <button class="nav-btn" id="color-btn">
           <span class="nav-icon">🖌️</span>
@@ -755,7 +755,7 @@
 
           // Reset skali
           scaleSlider.value = 100;
-          scaleValue.textContent = "100%";
+          scaleValue.textContent = "Scale: 100%";
           model.scale.set(1, 1, 1);
           originalScale = 1;
 
@@ -862,7 +862,7 @@
         // Adjust position to keep bottom on grid
         model.position.y = -box.min.y * scaleFactor;
 
-        scaleValue.textContent = scalePercent + "%";
+        scaleValue.textContent = "Scale: " + scalePercent + "%";
       });
 
       // Obsługa koła kolorów
