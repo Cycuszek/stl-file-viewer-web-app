@@ -152,6 +152,13 @@
         .scale-control input[type="range"] {
           width: 80px;
         }
+
+        .dropdown-menu {
+          bottom: 50px;
+          left: 0;
+          transform: none;
+          min-width: 150px;
+        }
       }
 
       @media (max-width: 480px) {
@@ -161,15 +168,16 @@
         }
 
         .nav-section {
-          gap: 5px;
+          gap: 3px;
         }
 
         .nav-btn {
-          min-width: 35px;
+          min-width: 30px;
+          padding: 2px;
         }
 
         .nav-icon {
-          font-size: 16px;
+          font-size: 14px;
         }
 
         .nav-label {
@@ -177,11 +185,40 @@
         }
 
         .scale-control {
-          margin-right: 10px;
+          margin-right: 5px;
         }
 
         .scale-control input[type="range"] {
-          width: 60px;
+          width: 50px;
+        }
+
+        .dropdown-menu {
+          bottom: 40px;
+          min-width: 120px;
+        }
+
+        .dropdown-item {
+          padding: 3px;
+        }
+      }
+
+      @media (max-width: 360px) {
+        #bottom-nav {
+          justify-content: center;
+        }
+
+        .nav-section:first-child {
+          display: none;
+        }
+
+        .nav-section:last-child {
+          display: none;
+        }
+
+        .dropdown-menu {
+          bottom: 40px;
+          left: 50%;
+          transform: translateX(-50%);
         }
       }
 
