@@ -751,7 +751,7 @@
           const centerZ = (box.max.z + box.min.z) / 2;
 
           // Ustaw model na poziomie siatki (dolna część modelu dotyka siatki)
-          model.position.set(-centerX, -box.min.y, -centerZ);
+          model.position.set(-centerX, -box.min.y * model.scale.y, -centerZ);
 
           // Reset skali
           scaleSlider.value = 100;
@@ -852,9 +852,24 @@
         const scalePercent = parseInt(scaleSlider.value);
         const scaleFactor = scalePercent / 100;
 
-        // Calculate current bottom position
-        const box = modelGeometry.boundingBox;
-        const currentBottom = -box.min.y * model.scale.y;
+        // Update model scale while maintaining grid contact
+        const initialBottom = -modelGeometry.boundingBox.min.y;
+        model.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        model.position.y = initialBottom * scaleFactor;
+
+        // Update camera Y position based on scaled height
+        const modelBox = new THREE.Box3().setFromObject(model);
+        const modelSize = new THREE.Vector3();
+        modelBox.getSize(modelSize);
+        const scaledHeight = modelSize.y * scaleFactor;
+        const cameraYOffset = scaledHeight * 0.5;
+
+        // Update camera position
+        const modelCenter = new THREE.Vector3();
+        modelBox.getCenter(modelCenter);
+        camera.position.y = modelCenter.y + cameraYOffset;
+        controls.target.y = modelCenter.y;
+        controls.update();
 
         // Apply new scale
         model.scale.set(scaleFactor, scaleFactor, scaleFactor);
