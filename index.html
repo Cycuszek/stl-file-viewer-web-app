@@ -5,6 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>STL File Viewer v0.1</title>
     <style>
+      .dropdown {
+        position: relative;
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        border-radius: 4px;
+        padding: 5px;
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 100px;
+        z-index: 101;
+      }
+
+      .dropdown:hover .dropdown-menu {
+        display: flex;
+      }
+
+      .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: none;
+        border: none;
+        color: white;
+        padding: 5px;
+        cursor: pointer;
+        width: 100%;
+        border-radius: 4px;
+      }
+
+      .dropdown-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -415,30 +455,38 @@
       </div>
 
       <div class="nav-section">
-        <button class="nav-btn" id="view-front">
-          <span class="nav-icon">🫵</span>
-          <span class="nav-label">Front</span>
-        </button>
-        <button class="nav-btn" id="view-top">
-          <span class="nav-icon">👇</span>
-          <span class="nav-label">Top</span>
-        </button>
-        <button class="nav-btn" id="view-right">
-          <span class="nav-icon">👈</span>
-          <span class="nav-label">Right</span>
-        </button>
-        <button class="nav-btn" id="view-left">
-          <span class="nav-icon">👉</span>
-          <span class="nav-label">Left</span>
-        </button>
-        <button class="nav-btn" id="view-back">
-          <span class="nav-icon">🤚</span>
-          <span class="nav-label">Back</span>
-        </button>
-        <button class="nav-btn" id="view-bottom">
-          <span class="nav-icon">☝️</span>
-          <span class="nav-label">Bottom</span>
-        </button>
+        <div class="dropdown">
+          <button class="nav-btn dropdown-toggle" id="view-menu">
+            <span class="nav-icon">👀</span>
+            <span class="nav-label">Views</span>
+          </button>
+          <div class="dropdown-menu">
+            <button class="dropdown-item" id="view-front">
+              <span class="nav-icon">🫵</span>
+              <span class="nav-label">Front</span>
+            </button>
+            <button class="dropdown-item" id="view-top">
+              <span class="nav-icon">👇</span>
+              <span class="nav-label">Top</span>
+            </button>
+            <button class="dropdown-item" id="view-right">
+              <span class="nav-icon">👈</span>
+              <span class="nav-label">Right</span>
+            </button>
+            <button class="dropdown-item" id="view-left">
+              <span class="nav-icon">👉</span>
+              <span class="nav-label">Left</span>
+            </button>
+            <button class="dropdown-item" id="view-back">
+              <span class="nav-icon">🤚</span>
+              <span class="nav-label">Back</span>
+            </button>
+            <button class="dropdown-item" id="view-bottom">
+              <span class="nav-icon">☝️</span>
+              <span class="nav-label">Bottom</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="nav-section">
