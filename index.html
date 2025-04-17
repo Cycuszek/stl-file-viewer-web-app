@@ -849,8 +849,9 @@
       scaleSlider.addEventListener("input", () => {
         if (!isModelLoaded) return;
 
-        const scalePercent = parseInt(scaleSlider.value);
+        const scalePercent = Math.round(parseInt(scaleSlider.value));
         const scaleFactor = scalePercent / 100;
+        scaleValue.textContent = "Scale: " + scalePercent + "%";
 
         // Update model scale while maintaining grid contact
         const initialBottom = -modelGeometry.boundingBox.min.y;
