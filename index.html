@@ -137,7 +137,7 @@
         }
 
         .nav-btn {
-          min-width: 40px;
+          min-width: 50px;
           padding: 3px;
         }
 
@@ -147,6 +147,7 @@
 
         .nav-label {
           font-size: 8px;
+          margin-top: 1px;
         }
 
         .scale-control input[type="range"] {
@@ -159,11 +160,15 @@
           transform: none;
           min-width: 150px;
         }
+
+        .nav-section {
+          gap: 8px;
+        }
       }
 
       @media (max-width: 480px) {
         #bottom-nav {
-          height: 50px;
+          height: 55px;
           padding: 0 5px;
         }
 
@@ -195,7 +200,7 @@
         }
 
         .dropdown-menu {
-          bottom: 50px;
+          bottom: 55px;
           min-width: 120px;
         }
 
@@ -494,6 +499,10 @@
       </div>
 
       <div class="nav-section">
+        <button class="nav-btn" id="center-camera">
+          <span class="nav-icon">🎯</span>
+          <span class="nav-label">Center</span>
+        </button>
         <div class="dropdown">
           <button class="nav-btn dropdown-toggle" id="view-menu">
             <span class="nav-icon">👀</span>
