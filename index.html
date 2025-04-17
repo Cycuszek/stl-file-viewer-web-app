@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>STL File Viewer v0.1</title>
     <style>
+      .tooltip.hidden {
+        display: none;
+      }
+
+      .tooltip {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 8px 12px;
+        background-color: rgba(255, 255, 255, 0.8);
+        color: #333;
+        border-radius: 4px;
+        font-size: 14px;
+        z-index: 1000;
+        backdrop-filter: blur(2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
       .dropdown {
         position: relative;
       }
@@ -485,6 +502,7 @@
       </div>
     </div>
 
+    <div id="tooltip" class="tooltip hidden">Model loaded</div>
     <div id="bottom-nav">
       <div class="nav-section">
         <button class="nav-btn" id="open-file">
@@ -1058,6 +1076,16 @@
 
       // Zainicjuj aplikację
       init();
+    </script>
+    <script>
+      // Example function to show tooltip when model is loaded
+      function onModelLoaded() {
+        document.getElementById("tooltip").classList.remove("hidden");
+      }
+
+      // This would be called when the model is actually loaded
+      // For now we'll just call it after 1 second for demonstration
+      setTimeout(onModelLoaded, 1000);
     </script>
   </body>
 </html>
