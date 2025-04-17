@@ -962,6 +962,52 @@
       document.getElementById("center-camera").addEventListener("click", () => {
         if (!isModelLoaded) return;
 
+        // Pobierz skalę modelu
+        const currentScale = model.scale.x;
+
+        // Oblicz nową pozycję kamery uwzględniając skalę
+        const modelBox = new THREE.Box3().setFromObject(model);
+        const modelSize = new THREE.Vector3();
+        modelBox.getSize(modelSize);
+
+        // Oblicz wymiary modelu z uwzględnieniem skali
+        const scaledSize = new THREE.Vector3(
+          modelSize.x * currentScale,
+          modelSize.y * currentScale,
+          modelSize.z * currentScale
+        );
+
+        // Oblicz maksymalny wymiar i odległość kamery
+        const scaledMaxDim = Math.max(scaledSize.x, scaledSize.y, scaledSize.z);
+        const currentFov = camera.fov * (Math.PI / 180);
+        let newCameraZ = Math.abs(scaledMaxDim / Math.sin(currentFov / 2));
+
+        // Dodaj dodatkowy margines i automatyczny zoom out
+        const marginFactor = 1.5;
+        newCameraZ *= marginFactor;
+
+        // Jeśli model jest większy niż domyślny rozmiar, zwiększ odległość kamery
+        const defaultSize = 10; // Domyślny rozmiar modelu
+        if (scaledMaxDim > defaultSize) {
+          newCameraZ *= scaledMaxDim / defaultSize;
+        }
+
+        // Ustaw pozycję kamery
+        const modelCenter = new THREE.Vector3();
+        modelBox.getCenter(modelCenter);
+
+        // Dostosuj wysokość kamery w zależności od wysokości modelu
+        const scaledHeight = modelSize.y * currentScale;
+        const cameraYOffset = scaledHeight * 0.5; // Przesuń kamerę wyżej o połowę wysokości modelu
+
+        camera.position.set(
+          modelCenter.x,
+          modelCenter.y + cameraYOffset,
+          newCameraZ
+        );
+        controls.target.copy(modelCenter);
+        controls.update();
+
         const box = modelGeometry.boundingBox;
         const centerX = (box.max.x + box.min.x) / 2;
         const centerY = (box.max.y + box.min.y) / 2;
