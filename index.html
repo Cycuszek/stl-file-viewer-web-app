@@ -1008,14 +1008,26 @@
           newCameraZ *= scaledMaxDim / defaultSize;
         }
 
+        // Jeśli skala jest powyżej 150%, podnieś kamerę o dodatkowe 20%
+        if (currentScale > 1.5) {
+          const additionalOffset = scaledMaxDim * 0.2;
+          camera.position.y += additionalOffset;
+        }
+
         // Ustaw pozycję kamery
         const modelCenter = new THREE.Vector3();
         modelBox.getCenter(modelCenter);
 
         // Dostosuj wysokość kamery w zależności od wysokości modelu
         const scaledHeight = modelSize.y * currentScale;
-        const cameraYOffset = scaledHeight * 0.5; // Przesuń kamerę wyżej o połowę wysokości modelu
+        let cameraYOffset = scaledHeight * 0.5; // Przesuń kamerę wyżej o połowę wysokości modelu
 
+        // Dodaj dodatkowe przesunięcie dla dużych skal
+        if (currentScale > 1.5) {
+          cameraYOffset += scaledMaxDim * 0.2;
+        }
+
+        // Ustaw pozycję kamery
         camera.position.set(
           modelCenter.x,
           modelCenter.y + cameraYOffset,
