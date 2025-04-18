@@ -799,6 +799,7 @@
           // Ukryj strefę upuszczania
           dropzone.classList.add("hidden");
           isModelLoaded = true;
+          onModelLoaded();
         };
         reader.readAsArrayBuffer(file);
       }
@@ -1080,7 +1081,13 @@
     <script>
       // Example function to show tooltip when model is loaded
       function onModelLoaded() {
-        document.getElementById("tooltip").classList.remove("hidden");
+        const box = modelGeometry.boundingBox;
+        const width = (box.max.x - box.min.x).toFixed(2);
+        const height = (box.max.y - box.min.y).toFixed(2);
+        const depth = (box.max.z - box.min.z).toFixed(2);
+        const tooltip = document.getElementById("tooltip");
+        tooltip.textContent = `Model loaded: ${width}mm x ${height}mm x ${depth}mm`;
+        tooltip.classList.remove("hidden");
       }
 
       // This would be called when the model is actually loaded
