@@ -771,7 +771,7 @@
         );
         const scaledDepth = (originalDimensions.depth * scaleFactor).toFixed(2);
         const tooltip = document.getElementById("tooltip");
-        tooltip.textContent = `Size: ${scaledWidth}mm x ${scaledHeight}mm x ${scaledDepth}mm`;
+        tooltip.innerHTML = `Width: ${scaledWidth} mm<br>Height: ${scaledHeight} mm<br>Depth: ${scaledDepth} mm`; // Use innerHTML for line breaks
         tooltip.classList.remove("hidden");
       }
 
