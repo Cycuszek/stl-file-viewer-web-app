@@ -607,10 +607,8 @@
       const colorPickerContainer = document.getElementById(
         "color-picker-container"
       );
-      // Removed unused colorWheel variable
       const colorPreview = document.getElementById("color-preview");
       const closeColorPicker = document.getElementById("close-color-picker");
-      // Removed PayPal modal element references
 
       // Inicjalizacja Three.js
       function init() {
@@ -903,15 +901,7 @@
         modelBox.getSize(modelSize);
         const modelCenter = new THREE.Vector3();
         modelBox.getCenter(modelCenter);
-
-        // Adjust camera height relative to the scaled model center
-        // This part might need further refinement depending on desired behavior,
-        // but restores the original intent of adjusting camera with scale.
-        // A simple approach: keep camera looking at the center, adjust height slightly.
-        // More complex adjustments might be needed for optimal viewing at all scales.
-        // For now, let's just ensure controls target the new center.
         controls.target.copy(modelCenter);
-        // Optionally adjust camera Y position - this was complex and potentially conflicting before.
         // Let's keep it simple for now or rely on the center button.
         // Example: camera.position.y = modelCenter.y + someOffsetBasedOnScale;
         controls.update();
@@ -957,9 +947,6 @@
           }
         }
       });
-
-      // Removed unused color conversion functions (hsvToRgb, rgbToHex)
-
       // Centrowanie kamery - Refactored for clarity
       document.getElementById("center-camera").addEventListener("click", () => {
         if (
@@ -1014,7 +1001,5 @@
       // Zainicjuj aplikację
       init();
     </script>
-    <!-- Removed separate script tag, moved onModelLoaded into module script -->
-    <!-- Removed PayPal Modal HTML -->
   </body>
 </html>
