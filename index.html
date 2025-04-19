@@ -261,37 +261,6 @@
         margin-top: 14px;
       }
 
-      .btn {
-        width: 40px;
-        height: 40px;
-        border: none;
-        border-radius: 8px;
-        background-color: #555;
-        color: white;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background-color 0.3s;
-        margin-bottom: 5px;
-      }
-
-      .btn:hover {
-        background-color: #777;
-      }
-
-      .btn svg {
-        width: 24px;
-        height: 24px;
-        fill: white;
-      }
-
-      .btn-label {
-        color: #aaa;
-        font-size: 10px;
-        text-align: center;
-      }
-
       #dropzone {
         position: absolute;
         top: 0;
@@ -336,26 +305,6 @@
         color: #888;
         font-size: 12px;
         z-index: 5;
-      }
-
-      .slider-container {
-        display: flex;
-        flex-direction: column;
-        align-items: baseline;
-        width: 60px;
-        height: 50px;
-        margin: 38px 0 20px;
-        justify-content: flex-start;
-        position: relative;
-        overflow: visible;
-      }
-
-      .slider-label {
-        color: #aaa;
-        font-size: 10px;
-        margin: 40px 0 0 0;
-        text-align: center;
-        order: 2;
       }
 
       #scale-value {
@@ -479,8 +428,7 @@
         margin-top: 3px;
       }
 
-      #grid-btn {
-      }
+      /* Removed empty #grid-btn rule */
     </style>
   </head>
   <body>
@@ -573,10 +521,7 @@
           />
           <div id="scale-value">Scale: 100%</div>
         </div>
-        <button class="nav-btn" id="tip-btn">
-          <span class="nav-icon">☕</span>
-          <span class="nav-label">Tip</span>
-        </button>
+        <!-- Removed Tip button -->
       </div>
     </div>
 
@@ -630,7 +575,7 @@
       const colorPickerContainer = document.getElementById(
         "color-picker-container"
       );
-      const colorWheel = document.getElementById("color-wheel");
+      // Removed unused colorWheel variable
       const colorPreview = document.getElementById("color-preview");
       const closeColorPicker = document.getElementById("close-color-picker");
 
@@ -804,6 +749,22 @@
         reader.readAsArrayBuffer(file);
       }
 
+      // Example function to show tooltip when model is loaded
+      function onModelLoaded() {
+        if (!modelGeometry || !modelGeometry.boundingBox) return; // Add check
+        const box = modelGeometry.boundingBox;
+        const width = (box.max.x - box.min.x).toFixed(2);
+        const height = (box.max.y - box.min.y).toFixed(2);
+        const depth = (box.max.z - box.min.z).toFixed(2);
+        const tooltip = document.getElementById("tooltip");
+        tooltip.textContent = `Model loaded: ${width}mm x ${height}mm x ${depth}mm`;
+        tooltip.classList.remove("hidden");
+        // Hide tooltip after 3 seconds
+        setTimeout(() => {
+          tooltip.classList.add("hidden");
+        }, 3000);
+      }
+
       // Funkcje widoków kamery
       document.getElementById("view-front").addEventListener("click", () => {
         if (!isModelLoaded) return;
@@ -866,41 +827,30 @@
 
       // Skalowanie modelu
       scaleSlider.addEventListener("input", () => {
-        if (!isModelLoaded) return;
+        if (
+          !isModelLoaded ||
+          !model ||
+          !modelGeometry ||
+          !modelGeometry.boundingBox
+        )
+          return;
 
-        const scalePercent = Math.round(parseInt(scaleSlider.value));
+        const scalePercent = parseInt(scaleSlider.value);
         const scaleFactor = scalePercent / 100;
         scaleValue.textContent = "Scale: " + scalePercent + "%";
 
-        // Update model scale while maintaining grid contact
-        const initialBottom = -modelGeometry.boundingBox.min.y;
-        model.scale.set(scaleFactor, scaleFactor, scaleFactor);
-        model.position.y = initialBottom * scaleFactor;
-
-        // Update camera Y position based on scaled height
-        const modelBox = new THREE.Box3().setFromObject(model);
-        const modelSize = new THREE.Vector3();
-        modelBox.getSize(modelSize);
-        const scaledHeight = modelSize.y * scaleFactor;
-        const cameraYOffset = scaledHeight * 0.5;
-
-        // Update camera position
-        const modelCenter = new THREE.Vector3();
-        modelBox.getCenter(modelCenter);
-        camera.position.y = modelCenter.y + cameraYOffset;
-        controls.target.y = modelCenter.y;
-        controls.update();
-
-        // Apply new scale
+        // Apply scale
         model.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-        // Adjust position to keep bottom on grid
-        model.position.y = -box.min.y * scaleFactor;
+        // Adjust position to keep bottom on grid (using original bounding box min y)
+        const initialBottomY = -modelGeometry.boundingBox.min.y;
+        model.position.y = initialBottomY * scaleFactor;
 
-        scaleValue.textContent = "Scale: " + scalePercent + "%";
+        // Note: Camera adjustments are handled by the 'center-camera' button if needed.
+        // This simplifies the scaling logic.
       });
 
-      // Obsługa koła kolorów
+      // Obsługa przycisku koloru
       colorBtn.addEventListener("click", () => {
         if (!isModelLoaded) {
           alert("First load the STL");
@@ -937,162 +887,54 @@
         }
       });
 
-      // Konwersja HSV na RGB
-      function hsvToRgb(h, s, v) {
-        let r, g, b;
-        const i = Math.floor(h * 6);
-        const f = h * 6 - i;
-        const p = v * (1 - s);
-        const q = v * (1 - f * s);
-        const t = v * (1 - (1 - f) * s);
+      // Removed unused color conversion functions (hsvToRgb, rgbToHex)
 
-        switch (i % 6) {
-          case 0:
-            r = v;
-            g = t;
-            b = p;
-            break;
-          case 1:
-            r = q;
-            g = v;
-            b = p;
-            break;
-          case 2:
-            r = p;
-            g = v;
-            b = t;
-            break;
-          case 3:
-            r = p;
-            g = q;
-            b = v;
-            break;
-          case 4:
-            r = t;
-            g = p;
-            b = v;
-            break;
-          case 5:
-            r = v;
-            g = p;
-            b = q;
-            break;
-        }
-
-        return {
-          r: Math.floor(r * 255),
-          g: Math.floor(g * 255),
-          b: Math.floor(b * 255),
-        };
-      }
-
-      // Konwersja RGB na HEX
-      function rgbToHex(r, g, b) {
-        return (
-          "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
-        );
-      }
-
-      // Centrowanie kamery
+      // Centrowanie kamery - Refactored for clarity
       document.getElementById("center-camera").addEventListener("click", () => {
-        if (!isModelLoaded) return;
+        if (
+          !isModelLoaded ||
+          !model ||
+          !modelGeometry ||
+          !modelGeometry.boundingBox
+        )
+          return;
 
-        // Pobierz skalę modelu
-        const currentScale = model.scale.x;
+        // Get current scale
+        const currentScale = model.scale.x; // Assuming uniform scaling
 
-        // Oblicz nową pozycję kamery uwzględniając skalę
+        // Calculate bounding box of the *currently scaled* model
         const modelBox = new THREE.Box3().setFromObject(model);
         const modelSize = new THREE.Vector3();
-        modelBox.getSize(modelSize);
-
-        // Oblicz wymiary modelu z uwzględnieniem skali
-        const scaledSize = new THREE.Vector3(
-          modelSize.x * currentScale,
-          modelSize.y * currentScale,
-          modelSize.z * currentScale
-        );
-
-        // Oblicz maksymalny wymiar i odległość kamery
-        const scaledMaxDim = Math.max(scaledSize.x, scaledSize.y, scaledSize.z);
-        const currentFov = camera.fov * (Math.PI / 180);
-        let newCameraZ = Math.abs(scaledMaxDim / Math.sin(currentFov / 2));
-
-        // Dodaj dodatkowy margines i automatyczny zoom out
-        const marginFactor = 1.5;
-        newCameraZ *= marginFactor;
-
-        // Jeśli model jest większy niż domyślny rozmiar, zwiększ odległość kamery
-        const defaultSize = 10; // Domyślny rozmiar modelu
-        if (scaledMaxDim > defaultSize) {
-          newCameraZ *= scaledMaxDim / defaultSize;
-        }
-
-        // Jeśli skala jest powyżej 150%, podnieś kamerę o dodatkowe 20%
-        if (currentScale > 1.5) {
-          const additionalOffset = scaledMaxDim * 0.2;
-          camera.position.y += additionalOffset;
-        }
-
-        // Ustaw pozycję kamery
+        modelBox.getSize(modelSize); // This gives the size *after* scaling
         const modelCenter = new THREE.Vector3();
-        modelBox.getCenter(modelCenter);
+        modelBox.getCenter(modelCenter); // This gives the center *after* scaling and positioning
 
-        // Dostosuj wysokość kamery w zależności od wysokości modelu
-        const scaledHeight = modelSize.y * currentScale;
-        let cameraYOffset = scaledHeight * 0.5; // Przesuń kamerę wyżej o połowę wysokości modelu
+        // Determine the largest dimension of the scaled model
+        const maxScaledDim = Math.max(modelSize.x, modelSize.y, modelSize.z);
 
-        // Dodaj dodatkowe przesunięcie dla dużych skal
-        if (currentScale > 1.5) {
-          cameraYOffset += scaledMaxDim * 0.2;
-        }
-
-        // Ustaw pozycję kamery
-        camera.position.set(
-          modelCenter.x,
-          modelCenter.y + cameraYOffset,
-          newCameraZ
-        );
-        controls.target.copy(modelCenter);
-        controls.update();
-
-        const box = modelGeometry.boundingBox;
-        const centerX = (box.max.x + box.min.x) / 2;
-        const centerY = (box.max.y + box.min.y) / 2;
-        const centerZ = (box.max.z + box.min.z) / 2;
-
-        const maxDim = Math.max(
-          box.max.x - box.min.x,
-          box.max.y - box.min.y,
-          box.max.z - box.min.z
-        );
+        // Calculate the distance needed to fit the model in the view
         const fov = camera.fov * (Math.PI / 180);
-        let cameraZ = Math.abs(maxDim / Math.sin(fov / 2));
-        cameraZ *= 1.5; // Dodatkowy margines
+        const cameraDistance = Math.abs(maxScaledDim / Math.sin(fov / 2));
 
-        camera.position.set(cameraZ * 0.5, cameraZ * 0.5, cameraZ);
-        camera.lookAt(centerX, centerY, centerZ);
-        controls.target.set(centerX, centerY, centerZ);
+        // Set camera position slightly away and elevated
+        const marginFactor = 1.5; // Add some padding
+        const cameraOffset = new THREE.Vector3(
+          0,
+          modelSize.y * 0.3,
+          cameraDistance * marginFactor
+        ); // Elevate slightly based on height
+
+        // Calculate new camera position relative to the model's center
+        const newCameraPos = modelCenter.clone().add(cameraOffset);
+
+        camera.position.copy(newCameraPos);
+        controls.target.copy(modelCenter); // Look at the center of the scaled model
         controls.update();
       });
 
       // Zainicjuj aplikację
       init();
     </script>
-    <script>
-      // Example function to show tooltip when model is loaded
-      function onModelLoaded() {
-        const box = modelGeometry.boundingBox;
-        const width = (box.max.x - box.min.x).toFixed(2);
-        const height = (box.max.y - box.min.y).toFixed(2);
-        const depth = (box.max.z - box.min.z).toFixed(2);
-        const tooltip = document.getElementById("tooltip");
-        tooltip.textContent = `Model loaded: ${width}mm x ${height}mm x ${depth}mm`;
-        tooltip.classList.remove("hidden");
-      }
-
-      // This would be called when the model is actually loaded
-      // For now we'll just call it after 1 second for demonstration
-      setTimeout(onModelLoaded, 1000);
-    </script>
+    <!-- Removed separate script tag, moved onModelLoaded into module script -->
   </body>
 </html>
