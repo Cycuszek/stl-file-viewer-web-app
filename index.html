@@ -31,14 +31,16 @@
         bottom: 100%;
         left: 50%;
         transform: translateX(-50%);
-        background-color: #333;
-        border-radius: 4px;
-        padding: 5px;
+        background-color: #ffffff; /* Match nav background */
+        border-radius: 8px; /* Consistent rounding */
+        padding: 8px; /* More padding */
         display: none;
         flex-direction: column;
-        gap: 5px;
-        min-width: 100px;
+        gap: 4px; /* Slightly smaller gap */
+        min-width: 120px; /* Wider menu */
         z-index: 101;
+        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
+        border: 1px solid #eee; /* Subtle border */
       }
 
       .dropdown:hover .dropdown-menu {
@@ -48,18 +50,34 @@
       .dropdown-item {
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 8px; /* More gap */
         background: none;
         border: none;
-        color: white;
-        padding: 5px;
+        color: #333; /* Darker text */
+        padding: 8px 12px; /* More padding */
         cursor: pointer;
         width: 100%;
-        border-radius: 4px;
+        border-radius: 6px; /* Consistent rounding */
+        text-align: left; /* Ensure text aligns left */
+        transition: background-color 0.2s ease;
       }
 
       .dropdown-item:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: #f0f0f0; /* Match button hover */
+      }
+      .dropdown-item:active {
+        background-color: #e0e0e0; /* Match button active */
+      }
+      /* Ensure icons in dropdown align */
+      .dropdown-item .nav-icon {
+        font-size: 18px; /* Slightly smaller icon */
+        margin-bottom: 0;
+        color: #555;
+      }
+      .dropdown-item .nav-label {
+        font-size: 12px; /* Slightly larger label */
+        font-weight: normal;
+        color: #333;
       }
 
       * {
@@ -73,13 +91,14 @@
         overflow: hidden;
         display: flex;
         height: 100vh;
-        background-color: #f5f5f5;
+        background-color: #e8e8e8; /* Slightly darker background */
       }
 
       #container {
         position: relative;
         overflow: hidden;
-        height: calc(100vh - 60px);
+        /* Adjust height based on new nav height */
+        height: calc(100vh - 70px);
       }
 
       #bottom-nav {
@@ -87,18 +106,20 @@
         bottom: 0;
         left: 0;
         right: 0;
-        height: 60px;
-        background-color: #333;
+        height: 70px; /* Increased height for better touch */
+        background-color: #ffffff; /* Lighter background */
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around; /* Space out sections more evenly */
         align-items: center;
-        padding: 0 20px;
+        padding: 0 10px; /* Adjusted padding */
         z-index: 100;
+        border-top: 1px solid #ddd; /* Subtle top border */
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05); /* Subtle shadow */
       }
 
       .nav-section {
         display: flex;
-        gap: 10px;
+        gap: 15px; /* Increased gap */
         align-items: center;
       }
 
@@ -109,25 +130,32 @@
         justify-content: center;
         background: none;
         border: none;
-        color: white;
-        padding: 5px;
+        color: #555; /* Darker icon/text color */
+        padding: 8px; /* Increased padding */
         cursor: pointer;
-        min-width: 50px;
+        min-width: 60px; /* Slightly wider */
+        border-radius: 8px; /* Rounded corners */
+        transition: background-color 0.2s ease; /* Smooth transition */
       }
 
       .nav-btn:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-        border-radius: 4px;
+        background-color: #f0f0f0; /* Subtle hover background */
+      }
+
+      .nav-btn:active {
+        background-color: #e0e0e0; /* Slightly darker active state */
       }
 
       .nav-icon {
-        font-size: 20px;
+        font-size: 24px; /* Larger icons */
         line-height: 1;
+        margin-bottom: 4px; /* Space between icon and label */
       }
 
       .nav-label {
-        font-size: 10px;
-        margin-top: 2px;
+        font-size: 11px; /* Slightly larger label */
+        margin-top: 0; /* Removed top margin */
+        font-weight: 500;
       }
 
       .scale-control {
@@ -138,113 +166,87 @@
       }
 
       .scale-control input[type="range"] {
-        width: 100px;
+        width: 100px; /* Keep slider width for now, will style later */
       }
 
       #scale-value {
-        color: white;
-        font-size: 10px;
-        margin-top: 2px;
+        color: #555; /* Darker text */
+        font-size: 11px; /* Match label size */
+        margin-top: 2px; /* Reduce margin */
+        font-weight: 500;
       }
+
+      /* --- Responsive Adjustments --- */
 
       @media (max-width: 768px) {
         #bottom-nav {
-          height: 50px;
-          padding: 0 10px;
+          height: 65px; /* Adjust height */
+          padding: 0 8px;
         }
-
-        .nav-btn {
-          min-width: 50px;
-          padding: 3px;
+        #container {
+          height: calc(100vh - 65px);
         }
-
-        .nav-icon {
-          font-size: 18px;
-        }
-
-        .nav-label {
-          font-size: 8px;
-          margin-top: 1px;
-        }
-
-        .scale-control input[type="range"] {
-          width: 80px;
-        }
-
-        .dropdown-menu {
-          bottom: 50px;
-          left: 0;
-          transform: none;
-          min-width: 150px;
-        }
-
         .nav-section {
-          gap: 8px;
+          gap: 10px;
+        }
+        .nav-btn {
+          min-width: 55px;
+          padding: 6px;
+        }
+        .nav-icon {
+          font-size: 22px;
+        }
+        .nav-label {
+          font-size: 10px;
+        }
+        .scale-control input[type="range"] {
+          width: 90px;
+        }
+        .dropdown-menu {
+          bottom: 65px; /* Match nav height */
         }
       }
 
       @media (max-width: 480px) {
         #bottom-nav {
-          height: 55px;
+          height: 60px; /* Adjust height */
           padding: 0 5px;
+          justify-content: space-around; /* Ensure spacing */
         }
-
+        #container {
+          height: calc(100vh - 60px);
+        }
         .nav-section {
           gap: 5px;
-        }
-
+        } /* Reduce gap further */
         .nav-btn {
-          min-width: 50px;
-          padding: 3px;
+          min-width: auto; /* Allow buttons to shrink */
+          padding: 5px;
+          flex-grow: 1; /* Allow buttons to take available space */
         }
-
         .nav-icon {
-          font-size: 16px;
+          font-size: 20px;
+          margin-bottom: 2px;
         }
-
         .nav-label {
-          display: block;
-          font-size: 8px;
-          margin-top: 1px;
+          font-size: 9px;
+          /* Optionally hide labels on very small screens */
+          /* display: none; */
         }
-
         .scale-control {
-          margin-right: 5px;
+          margin-right: 0;
         }
-
         .scale-control input[type="range"] {
-          width: 50px;
+          width: 70px;
         }
-
         .dropdown-menu {
-          bottom: 55px;
-          min-width: 120px;
+          bottom: 60px; /* Match nav height */
         }
-
-        .dropdown-item {
-          padding: 3px;
-        }
+        /* Hide tip button on smallest screens if needed */
+        /* #tip-btn { display: none; } */
       }
 
-      @media (max-width: 360px) {
-        #bottom-nav {
-          justify-content: center;
-        }
-
-        .nav-section:first-child {
-          display: none;
-        }
-
-        .nav-section:last-child {
-          display: none;
-        }
-
-        .dropdown-menu {
-          bottom: 40px;
-          left: 50%;
-          transform: translateX(-50%);
-        }
-      }
+      /* Remove 360px breakpoint adjustments as 480px covers it */
 
       .btn-container {
         display: flex;
@@ -310,41 +312,62 @@
       #scale-value {
         color: #aaa;
         font-size: 10px;
-        margin: 2px 0 0 0;
+        margin: 2px 0 0 0; /* Keep margin for spacing */
         text-align: center;
-        order: 3;
+        order: 3; /* Keep order for flex layout */
       }
 
-      .slider {
-        -webkit-appearance: none;
-        width: 120px;
-        height: 5px;
-        border-radius: 4px;
-        background: #555;
-        outline: none;
-        margin: 0 auto 5px;
-        transform: rotate(-90deg) translate(-50px, 30px);
-        transform-origin: left;
-        position: absolute;
-        top: 20px;
-      }
-
-      .slider::-webkit-slider-thumb {
+      /* --- Modern Slider Styles --- */
+      input[type="range"]#scale-slider {
+        /* Target specific slider */
         -webkit-appearance: none;
         appearance: none;
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: #4caf50;
+        width: 100%; /* Take full width of container */
+        height: 6px; /* Slightly thicker track */
+        background: #ddd; /* Lighter track */
+        border-radius: 3px;
+        outline: none;
         cursor: pointer;
+        margin: 10px 0 5px 0; /* Adjust margin */
+        /* Reset transforms if any were applied previously */
+        transform: none;
+        position: static;
       }
 
-      .slider::-moz-range-thumb {
-        width: 15px;
-        height: 15px;
+      input[type="range"]#scale-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px; /* Larger thumb */
+        height: 18px;
+        background: #007bff; /* Modern blue */
         border-radius: 50%;
-        background: #4caf50;
         cursor: pointer;
+        border: 2px solid white; /* Add border for contrast */
+        box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+      }
+
+      input[type="range"]#scale-slider::-moz-range-thumb {
+        width: 18px; /* Consistent size */
+        height: 18px;
+        background: #007bff;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid white;
+        box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Adjust scale-control layout */
+      .scale-control {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-right: 0; /* Remove margin, handled by nav-section gap */
+        width: 120px; /* Give it a fixed width */
+      }
+      /* Ensure slider takes width within its container */
+      .scale-control input[type="range"] {
+        width: 100%;
+        margin-top: 5px; /* Add space above slider */
       }
 
       #color-picker-container {
