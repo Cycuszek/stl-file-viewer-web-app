@@ -1002,6 +1002,14 @@
         controls.update();
       });
 
+      // Obsługa przycisku Tip
+      document.getElementById("tip-btn").addEventListener("click", () => {
+        window.open(
+          "https://www.paypal.com/ncp/payment/8XW4TLD7M8JU2",
+          "_blank"
+        );
+      });
+
       // Zainicjuj aplikację
       init();
     </script>
