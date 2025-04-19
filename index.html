@@ -847,21 +847,74 @@
         controls.update();
       }
 
-      // Zapisz jako JPG
-      document.getElementById("save-jpg").addEventListener("click", () => {
-        if (!isModelLoaded) {
-          alert("First load the STL");
-          return;
-        }
+      // Zapisz jako JPG (z obsługą Web Share API dla mobile)
+      document
+        .getElementById("save-jpg")
+        .addEventListener("click", async () => {
+          if (!isModelLoaded) {
+            alert("First load the STL");
+            return;
+          }
 
-        renderer.render(scene, camera);
-        const dataURL = renderer.domElement.toDataURL("image/jpeg");
+          try {
+            renderer.render(scene, camera);
+            const dataURL = renderer.domElement.toDataURL("image/jpeg");
+            const fileName = `${loadedFileNameBase}-stl.jpg`;
 
-        const link = document.createElement("a");
-        link.href = dataURL;
-        link.download = `${loadedFileNameBase}-stl.jpg`; // Use the stored base name
-        link.click();
-      });
+            // Spróbuj użyć Web Share API, jeśli jest dostępna
+            if (navigator.share && navigator.canShare) {
+              // Konwertuj dataURL na Blob, a następnie na File
+              const response = await fetch(dataURL);
+              const blob = await response.blob();
+              const file = new File([blob], fileName, { type: "image/jpeg" });
+
+              // Sprawdź, czy można udostępnić ten typ pliku
+              if (navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                  files: [file],
+                  title: "STL Model Screenshot",
+                  text: `Image of ${loadedFileNameBase}`,
+                });
+                console.log("Image shared successfully.");
+                return; // Zakończ, jeśli udostępnianie się powiodło
+              } else {
+                console.log("Sharing this file type is not supported.");
+              }
+            }
+
+            // Fallback: Użyj tradycyjnego pobierania, jeśli Web Share API nie jest dostępne lub nie obsługuje plików
+            console.log(
+              "Web Share API not available or file sharing not supported, falling back to download."
+            );
+            const link = document.createElement("a");
+            link.href = dataURL;
+            link.download = fileName;
+            link.click();
+          } catch (error) {
+            console.error("Error saving/sharing image:", error);
+            // Fallback na wypadek błędu (np. użytkownik anulował udostępnianie)
+            if (error.name !== "AbortError") {
+              // Nie pokazuj alertu, jeśli użytkownik anulował
+              alert("Could not save or share the image. Trying download link.");
+              // Ponownie spróbuj pobrać linkiem jako ostateczny fallback
+              try {
+                renderer.render(scene, camera); // Renderuj ponownie na wszelki wypadek
+                const dataURLFallback =
+                  renderer.domElement.toDataURL("image/jpeg");
+                const fileNameFallback = `${loadedFileNameBase}-stl.jpg`;
+                const linkFallback = document.createElement("a");
+                linkFallback.href = dataURLFallback;
+                linkFallback.download = fileNameFallback;
+                linkFallback.click();
+              } catch (fallbackError) {
+                console.error("Fallback download failed:", fallbackError);
+                alert("Failed to save image using fallback download.");
+              }
+            } else {
+              console.log("Sharing aborted by user.");
+            }
+          }
+        });
 
       // Obsługa przycisku siatki
       document.getElementById("grid-btn").addEventListener("click", () => {
