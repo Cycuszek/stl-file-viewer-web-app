@@ -4,24 +4,29 @@ A simple, web-based application for viewing 3D models stored in the STL file for
 
 ## Features
 
-- **Load STL Files:** Load models via drag-and-drop or by using the "Open" button.
-- **3D Model Interaction:**
-  - **Rotate:** Click and drag the left mouse button.
-  - **Pan:** Click and drag the right mouse button.
-  - **Zoom:** Use the mouse wheel.
-- **Viewing Options:**
-  - **Standard Views:** Switch between Front, Top, Right, Left, Back, and Bottom views.
-  - **Center View:** Automatically position the camera to focus on the model.
-  - **Grid:** Toggle the visibility of the ground grid.
-  - **Wireframe:** Toggle the wireframe representation of the model.
-- **Model Manipulation:**
-  - **Scale:** Adjust the model's size using a slider (Scale percentage is displayed).
-  - **Color:** Change the model's color using a built-in color picker.
-- **Information Display:**
-  - **Tooltip:** Shows the current dimensions (Width, Height, Depth) of the model in millimeters, updating dynamically as the model is scaled.
-- **Export:**
-  - **Save as JPG:** Save the current view of the model as a JPG image. The filename is automatically derived from the loaded STL file's name.
-- **Responsive Design:** Adapts to different screen sizes.
+- [x] **Load STL Files:** Load models via drag-and-drop, using the "Open" button (📂), or loading a default preview model (>Test Preview Model<).
+- [x] **3D Model Interaction:**
+  - [x] **Rotate:** Click and drag the left mouse button / Use one finger touch drag.
+  - [x] **Pan:** Click and drag the right mouse button / Use two finger touch drag.
+  - [x] **Zoom:** Use the mouse wheel / Use pinch gesture.
+- [x] **Viewing Options:**
+  - [x] **Standard Views:** Switch between Front, Top, Right, Left, Back, and Bottom views.
+  - [x] **Center View:** Automatically position the camera to focus on the model.
+  - [x] **Grid:** Toggle the visibility of the ground grid.
+  - [x] **Wireframe:** Toggle the wireframe representation of the model.
+- [x] **Model Manipulation:**
+  - [x] **Scale:** Adjust the model's size using a slider (Scale percentage is displayed).
+  - [x] **Color:** Change the model's color using a built-in color picker.
+- [x] **Information Display:**
+  - [x] **Tooltip:** Shows the loaded filename and current dimensions (Width, Height, Depth) of the model in millimeters, updating dynamically as the model is scaled.
+- [x] **Export:**
+  - [x] **Save as JPG:** Save the current view of the model as a JPG image. The image includes an overlay with the filename and dimensions. Attempts to use the Web Share API on mobile devices for easier sharing, falling back to a direct download. The filename is automatically derived from the loaded STL file's name.
+- [x] **Responsive Design:** Adapts to different screen sizes.
+- [x] **Tip Button:** A button (☕) to open a PayPal donation link in a new tab.
+
+## To Do
+
+- [ ] **Support Additional File Formats:** Add functionality to load and view models in formats like 3mf, oltp, stp, step, svg, amf, obj.
 
 ## How to Use
 
@@ -31,7 +36,7 @@ A simple, web-based application for viewing 3D models stored in the STL file for
 
 ## Controls Summary
 
-- **Left Mouse Button + Drag:** Rotate model.
-- **Right Mouse Button + Drag:** Pan view.
-- **Mouse Wheel:** Zoom in/out.
-- **Bottom Navigation Bar:** Access file operations, view controls, scaling, and color options.
+- **Left Mouse Button / One Finger Drag:** Rotate model.
+- **Right Mouse Button / Two Finger Drag:** Pan view.
+- **Mouse Wheel / Pinch Gesture:** Zoom in/out.
+- **Bottom Navigation Bar:** Access file operations, view controls, scaling, color options, and tip button.
