@@ -502,6 +502,10 @@
               <span class="nav-icon">🏁</span>
               <span class="nav-label">Grid</span>
             </button>
+            <button class="dropdown-item" id="view-wireframe">
+              <span class="nav-icon">🕸️</span>
+              <span class="nav-label">Wireframe</span>
+            </button>
           </div>
         </div>
         <button class="nav-btn" id="color-btn">
@@ -835,6 +839,14 @@
         gridHelper.visible = !gridHelper.visible;
         console.log("Grid visibility:", gridHelper.visible); // Dodaj logowanie dla debugowania
       });
+
+      // Obsługa przycisku wireframe
+      document
+        .getElementById("view-wireframe")
+        .addEventListener("click", () => {
+          if (!isModelLoaded || !model) return;
+          model.material.wireframe = !model.material.wireframe;
+        });
 
       // Skalowanie modelu - Restored original camera adjustment logic
       scaleSlider.addEventListener("input", () => {
