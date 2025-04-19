@@ -568,6 +568,7 @@
       let currentColor = 0x3498db; // Domyślny kolor (niebieski)
       let originalScale = 1; // Oryginalna skala modelu
       let gridHelper; // Dodajemy deklarację gridHelper
+      let originalDimensions = { width: 0, height: 0, depth: 0 }; // Store original dimensions
 
       const dropzone = document.getElementById("dropzone");
       const fileInput = document.getElementById("file-input");
@@ -719,6 +720,11 @@
           // Ustaw model na poziomie siatki (dolna część modelu dotyka siatki)
           model.position.set(-centerX, -box.min.y * model.scale.y, -centerZ);
 
+          // Store original dimensions
+          originalDimensions.width = box.max.x - box.min.x;
+          originalDimensions.height = box.max.y - box.min.y;
+          originalDimensions.depth = box.max.z - box.min.z;
+
           // Reset skali
           scaleSlider.value = 100;
           scaleValue.textContent = "Scale: 100%";
@@ -752,17 +758,22 @@
         reader.readAsArrayBuffer(file);
       }
 
-      // Example function to show tooltip when model is loaded
-      function onModelLoaded() {
-        if (!modelGeometry || !modelGeometry.boundingBox) return; // Add check
-        const box = modelGeometry.boundingBox;
-        const width = (box.max.x - box.min.x).toFixed(2);
-        const height = (box.max.y - box.min.y).toFixed(2);
-        const depth = (box.max.z - box.min.z).toFixed(2);
+      // Function to update tooltip content
+      function updateTooltip(scaleFactor = 1) {
+        if (!isModelLoaded) return;
+        const scaledWidth = (originalDimensions.width * scaleFactor).toFixed(2);
+        const scaledHeight = (originalDimensions.height * scaleFactor).toFixed(
+          2
+        );
+        const scaledDepth = (originalDimensions.depth * scaleFactor).toFixed(2);
         const tooltip = document.getElementById("tooltip");
-        tooltip.textContent = `Model loaded: ${width}mm x ${height}mm x ${depth}mm`;
+        tooltip.textContent = `Size: ${scaledWidth}mm x ${scaledHeight}mm x ${scaledDepth}mm`;
         tooltip.classList.remove("hidden");
-        // Tooltip will now remain visible
+      }
+
+      // Show tooltip when model is loaded
+      function onModelLoaded() {
+        updateTooltip(); // Show initial dimensions (scaleFactor = 1)
       }
 
       // Funkcje widoków kamery
@@ -866,6 +877,9 @@
         // Example: camera.position.y = modelCenter.y + someOffsetBasedOnScale;
         controls.update();
         // --- End of restored camera logic ---
+
+        // Update tooltip with scaled dimensions
+        updateTooltip(scaleFactor);
       });
 
       // Obsługa przycisku koloru
