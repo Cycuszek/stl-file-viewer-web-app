@@ -1,6 +1,7 @@
 # STL File Viewer
 
 A simple, web-based application for viewing 3D models stored in the STL file format. Built using HTML, CSS, and JavaScript with the Three.js library for 3D rendering.
+![stl_cyc_social](https://github.com/user-attachments/assets/1d632466-5611-4713-920c-31cd97b2103e)
 
 ## Features
 
