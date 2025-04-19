@@ -762,10 +762,7 @@
         const tooltip = document.getElementById("tooltip");
         tooltip.textContent = `Model loaded: ${width}mm x ${height}mm x ${depth}mm`;
         tooltip.classList.remove("hidden");
-        // Hide tooltip after 3 seconds
-        setTimeout(() => {
-          tooltip.classList.add("hidden");
-        }, 3000);
+        // Tooltip will now remain visible
       }
 
       // Funkcje widoków kamery
