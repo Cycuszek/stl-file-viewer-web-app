@@ -470,6 +470,14 @@
           accept=".stl"
           style="display: none"
         />
+        <p style="margin-top: 15px; font-size: 14px">
+          <a
+            href="#"
+            id="load-preview-btn"
+            style="color: #007bff; text-decoration: none"
+            >Test Preview Model</a
+          >
+        </p>
       </div>
       <div class="info-text">
         Use mouse to rotate model. <br />Right mouse to drag, wheel to zoom
@@ -723,19 +731,18 @@
         fileInput.click();
       });
 
-      // Załaduj model STL
-      function loadSTL(file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
+      // Helper function to load STL from ArrayBuffer
+      function loadSTLFromArrayBuffer(arrayBuffer, fileNameBase) {
+        try {
           const loader = new STLLoader();
-          const geometry = loader.parse(e.target.result);
+          const geometry = loader.parse(arrayBuffer);
           modelGeometry = geometry; // Zapisz geometrię
+          loadedFileNameBase = fileNameBase; // Update filename base
 
           // Usuń poprzedni model, jeśli istnieje
           if (model) {
             scene.remove(model);
           }
-
           // Utwórz nowy materiał i model
           const material = new THREE.MeshPhongMaterial({
             color: currentColor,
@@ -757,13 +764,11 @@
           originalDimensions.width = box.max.x - box.min.x;
           originalDimensions.height = box.max.y - box.min.y;
           originalDimensions.depth = box.max.z - box.min.z;
-
           // Reset skali
           scaleSlider.value = 100;
           scaleValue.textContent = "Scale: 100%";
           model.scale.set(1, 1, 1);
           originalScale = 1;
-
           // Dostosuj kamerę do modelu
           const maxDim = Math.max(
             box.max.x - box.min.x,
@@ -773,20 +778,35 @@
           const fov = camera.fov * (Math.PI / 180);
           let cameraZ = Math.abs(maxDim / Math.sin(fov / 2));
           cameraZ *= 1.5; // Dodatkowy margines
-
           // Ustaw kamerę nieco powyżej modelu
           camera.position.set(cameraZ * 0.5, cameraZ * 0.5, cameraZ);
-
           camera.updateProjectionMatrix();
           controls.target.set(0, (box.max.y - box.min.y) / 2, 0); // Punkt skupienia kamery na środku wysokości modelu
           controls.update();
 
           scene.add(model);
-
           // Ukryj strefę upuszczania
           dropzone.classList.add("hidden");
           isModelLoaded = true;
           onModelLoaded();
+        } catch (error) {
+          console.error("Error loading STL from ArrayBuffer:", error);
+          alert("Failed to load the STL model.");
+        }
+      }
+
+      // Load STL from File object (used by drag/drop and file input)
+      function loadSTL(file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          loadSTLFromArrayBuffer(
+            e.target.result,
+            file.name.replace(/\.stl$/i, "")
+          );
+        };
+        reader.onerror = function (e) {
+          console.error("FileReader error:", e);
+          alert("Failed to read the file.");
         };
         reader.readAsArrayBuffer(file);
       }
@@ -804,7 +824,6 @@
         tooltip.innerHTML = `<b>${loadedFileNameBase}</b><br>Width: ${scaledWidth} mm<br>Height: ${scaledHeight} mm<br>Depth: ${scaledDepth} mm`; // Use innerHTML for line breaks
         tooltip.classList.remove("hidden");
       }
-
       // Show tooltip when model is loaded
       function onModelLoaded() {
         updateTooltip(); // Show initial dimensions (scaleFactor = 1)
@@ -820,7 +839,6 @@
         if (!isModelLoaded) return;
         positionCamera(0, 0, -1);
       });
-
       document.getElementById("view-left").addEventListener("click", () => {
         if (!isModelLoaded) return;
         positionCamera(-1, 0, 0);
@@ -830,7 +848,6 @@
         if (!isModelLoaded) return;
         positionCamera(1, 0, 0);
       });
-
       document.getElementById("view-top").addEventListener("click", () => {
         if (!isModelLoaded) return;
         positionCamera(0, 1, 0);
@@ -840,7 +857,6 @@
         if (!isModelLoaded) return;
         positionCamera(0, -1, 0);
       });
-
       function positionCamera(x, y, z) {
         // Zachowaj dystans kamery od centrum
         const distance = camera.position.length();
@@ -893,13 +909,11 @@
             ctx.fillStyle = "rgba(0, 0, 0, 0.7)"; // Semi-transparent black text
             ctx.textAlign = "right";
             ctx.textBaseline = "bottom";
-
             // Draw signature first
             const signatureY = tempCanvas.height - padding;
             const signatureX = tempCanvas.width - padding;
             ctx.font = `${fontSize}px Arial`; // Normal font for signature
             ctx.fillText(signatureText, signatureX, signatureY);
-
             // Draw dimensions text above signature
             let currentY = signatureY - lineHeight; // Start above signature
             if (dimensionsText) {
@@ -919,7 +933,6 @@
             const fileName = `${loadedFileNameBase}-stl-with-dims.jpg`; // Updated filename
 
             // --- End of image creation with overlay ---
-
             // Spróbuj użyć Web Share API, jeśli jest dostępna
             if (navigator.share && navigator.canShare) {
               // Konwertuj finalDataURL na Blob, a następnie na File
@@ -940,7 +953,6 @@
                 console.log("Sharing this file type is not supported.");
               }
             }
-
             // Fallback: Użyj tradycyjnego pobierania, jeśli Web Share API nie jest dostępne lub nie obsługuje plików
             console.log(
               "Web Share API not available or file sharing not supported, falling back to download."
@@ -990,7 +1002,6 @@
           if (!isModelLoaded || !model) return;
           model.material.wireframe = !model.material.wireframe;
         });
-
       // Skalowanie modelu - Restored original camera adjustment logic
       scaleSlider.addEventListener("input", () => {
         if (
@@ -1099,10 +1110,8 @@
           modelSize.y * 0.3,
           cameraDistance * marginFactor
         ); // Elevate slightly based on height
-
         // Calculate new camera position relative to the model's center
         const newCameraPos = modelCenter.clone().add(cameraOffset);
-
         camera.position.copy(newCameraPos);
         controls.target.copy(modelCenter); // Look at the center of the scaled model
         controls.update();
@@ -1115,6 +1124,24 @@
           "_blank" // Opens in a new tab
         );
       });
+
+      // Add listener for the preview button
+      document
+        .getElementById("load-preview-btn")
+        .addEventListener("click", async (e) => {
+          e.preventDefault(); // Prevent default link behavior
+          try {
+            const response = await fetch("cyc_preview.stl");
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const arrayBuffer = await response.arrayBuffer();
+            loadSTLFromArrayBuffer(arrayBuffer, "cyc_preview"); // Load using the helper
+          } catch (error) {
+            console.error("Error fetching or loading preview STL:", error);
+            alert("Could not load the preview model.");
+          }
+        });
 
       // Zainicjuj aplikację
       init();
