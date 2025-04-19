@@ -857,14 +857,64 @@
           }
 
           try {
-            renderer.render(scene, camera);
-            const dataURL = renderer.domElement.toDataURL("image/jpeg");
-            const fileName = `${loadedFileNameBase}-stl.jpg`;
+            // --- Create image with overlay ---
+            renderer.render(scene, camera); // Render the scene first
+
+            // Create a temporary canvas
+            const tempCanvas = document.createElement("canvas");
+            const originalCanvas = renderer.domElement;
+            tempCanvas.width = originalCanvas.width;
+            tempCanvas.height = originalCanvas.height;
+            const ctx = tempCanvas.getContext("2d");
+
+            // Draw the rendered image onto the temporary canvas
+            ctx.drawImage(originalCanvas, 0, 0);
+
+            // Prepare text overlay
+            const tooltipElement = document.getElementById("tooltip");
+            let dimensionsText = "";
+            if (
+              tooltipElement &&
+              !tooltipElement.classList.contains("hidden")
+            ) {
+              // Replace <br> with newline for canvas drawing
+              dimensionsText = tooltipElement.innerHTML.replace(/<br>/gi, "\n");
+            }
+            const signatureText = "by cyc🩷";
+            const padding = 10; // Padding from the edge
+            const fontSize = Math.max(12, Math.min(tempCanvas.width / 50, 16)); // Dynamic font size
+            const lineHeight = fontSize * 1.2;
+
+            ctx.font = `${fontSize}px Arial`;
+            ctx.fillStyle = "rgba(0, 0, 0, 0.7)"; // Semi-transparent black text
+            ctx.textAlign = "right";
+            ctx.textBaseline = "bottom";
+
+            // Draw signature first
+            const signatureY = tempCanvas.height - padding;
+            const signatureX = tempCanvas.width - padding;
+            ctx.fillText(signatureText, signatureX, signatureY);
+
+            // Draw dimensions text above signature
+            if (dimensionsText) {
+              const lines = dimensionsText.split("\n");
+              let currentY = signatureY - lineHeight; // Start above signature
+              for (let i = lines.length - 1; i >= 0; i--) {
+                ctx.fillText(lines[i], signatureX, currentY);
+                currentY -= lineHeight;
+              }
+            }
+
+            // Get the final data URL from the temporary canvas
+            const finalDataURL = tempCanvas.toDataURL("image/jpeg");
+            const fileName = `${loadedFileNameBase}-stl-with-dims.jpg`; // Updated filename
+
+            // --- End of image creation with overlay ---
 
             // Spróbuj użyć Web Share API, jeśli jest dostępna
             if (navigator.share && navigator.canShare) {
-              // Konwertuj dataURL na Blob, a następnie na File
-              const response = await fetch(dataURL);
+              // Konwertuj finalDataURL na Blob, a następnie na File
+              const response = await fetch(finalDataURL);
               const blob = await response.blob();
               const file = new File([blob], fileName, { type: "image/jpeg" });
 
@@ -887,7 +937,7 @@
               "Web Share API not available or file sharing not supported, falling back to download."
             );
             const link = document.createElement("a");
-            link.href = dataURL;
+            link.href = finalDataURL; // Use the final data URL with overlay
             link.download = fileName;
             link.click();
           } catch (error) {
@@ -897,14 +947,16 @@
               // Nie pokazuj alertu, jeśli użytkownik anulował
               alert("Could not save or share the image. Trying download link.");
               // Ponownie spróbuj pobrać linkiem jako ostateczny fallback
+              // Note: Fallback will use the image *with* overlay if finalDataURL was generated
               try {
-                renderer.render(scene, camera); // Renderuj ponownie na wszelki wypadek
-                const dataURLFallback =
-                  renderer.domElement.toDataURL("image/jpeg");
-                const fileNameFallback = `${loadedFileNameBase}-stl.jpg`;
+                const fallbackDataURL =
+                  typeof finalDataURL !== "undefined"
+                    ? finalDataURL
+                    : renderer.domElement.toDataURL("image/jpeg"); // Get original if overlay failed
+                const fallbackFileName = `${loadedFileNameBase}-stl-fallback.jpg`;
                 const linkFallback = document.createElement("a");
-                linkFallback.href = dataURLFallback;
-                linkFallback.download = fileNameFallback;
+                linkFallback.href = fallbackDataURL;
+                linkFallback.download = fallbackFileName;
                 linkFallback.click();
               } catch (fallbackError) {
                 console.error("Fallback download failed:", fallbackError);
