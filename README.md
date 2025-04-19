@@ -3,6 +3,8 @@
 A simple, web-based application for viewing 3D models stored in the STL file format. Built using HTML, CSS, and JavaScript with the Three.js library for 3D rendering.
 ![stl_cyc_social](https://github.com/user-attachments/assets/1d632466-5611-4713-920c-31cd97b2103e)
 
+Check the latest deploy: https://cycuszek.github.io/stl-file-viewer-web-app/
+- [x] **Usable on:**  Chrome, Firefox, Safari (Web + Mobile)
 ## Features
 
 - [x] **Load STL Files:** Load models via drag-and-drop, using the "Open" button (📂), or loading a default preview model (>Test Preview Model<).
@@ -30,7 +32,9 @@ A simple, web-based application for viewing 3D models stored in the STL file for
 - [ ] **Support Additional File Formats:** Add functionality to load and view models in formats like 3mf, oltp, stp, step, svg, amf, obj.
 
 ## How to Use
+**Open:** https://cycuszek.github.io/stl-file-viewer-web-app/
 
+**Or:**
 1.  Open the `index.html` file in a web browser.
 2.  Drag and drop an STL file onto the designated area, or click the "Open" button (📂) to select an STL file from your computer.
 3.  Use the mouse controls and the buttons in the bottom navigation bar to interact with the model.
