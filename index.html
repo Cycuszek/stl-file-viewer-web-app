@@ -800,7 +800,8 @@
         );
         const scaledDepth = (originalDimensions.depth * scaleFactor).toFixed(2);
         const tooltip = document.getElementById("tooltip");
-        tooltip.innerHTML = `Width: ${scaledWidth} mm<br>Height: ${scaledHeight} mm<br>Depth: ${scaledDepth} mm`; // Use innerHTML for line breaks
+        // Add filename to tooltip
+        tooltip.innerHTML = `<b>${loadedFileNameBase}</b><br>Width: ${scaledWidth} mm<br>Height: ${scaledHeight} mm<br>Depth: ${scaledDepth} mm`; // Use innerHTML for line breaks
         tooltip.classList.remove("hidden");
       }
 
@@ -877,15 +878,18 @@
               tooltipElement &&
               !tooltipElement.classList.contains("hidden")
             ) {
-              // Replace <br> with newline for canvas drawing
-              dimensionsText = tooltipElement.innerHTML.replace(/<br>/gi, "\n");
+              // Get dimensions text, remove filename bold tag for canvas drawing
+              dimensionsText = tooltipElement.innerHTML
+                .replace(/<b>.*?<\/b><br>/i, "") // Remove filename line
+                .replace(/<br>/gi, "\n"); // Replace <br> with newline
             }
+            const filenameText = loadedFileNameBase; // Get filename
             const signatureText = "by cyc🩷";
             const padding = 10; // Padding from the edge
             const fontSize = Math.max(12, Math.min(tempCanvas.width / 50, 16)); // Dynamic font size
             const lineHeight = fontSize * 1.2;
 
-            ctx.font = `${fontSize}px Arial`;
+            ctx.font = `bold ${fontSize}px Arial`; // Bold for filename
             ctx.fillStyle = "rgba(0, 0, 0, 0.7)"; // Semi-transparent black text
             ctx.textAlign = "right";
             ctx.textBaseline = "bottom";
@@ -893,17 +897,22 @@
             // Draw signature first
             const signatureY = tempCanvas.height - padding;
             const signatureX = tempCanvas.width - padding;
+            ctx.font = `${fontSize}px Arial`; // Normal font for signature
             ctx.fillText(signatureText, signatureX, signatureY);
 
             // Draw dimensions text above signature
+            let currentY = signatureY - lineHeight; // Start above signature
             if (dimensionsText) {
               const lines = dimensionsText.split("\n");
-              let currentY = signatureY - lineHeight; // Start above signature
               for (let i = lines.length - 1; i >= 0; i--) {
                 ctx.fillText(lines[i], signatureX, currentY);
                 currentY -= lineHeight;
               }
             }
+
+            // Draw filename above dimensions
+            ctx.font = `bold ${fontSize}px Arial`; // Bold for filename
+            ctx.fillText(filenameText, signatureX, currentY);
 
             // Get the final data URL from the temporary canvas
             const finalDataURL = tempCanvas.toDataURL("image/jpeg");
