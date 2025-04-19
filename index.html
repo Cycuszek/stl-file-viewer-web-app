@@ -573,6 +573,7 @@
       let originalScale = 1; // Oryginalna skala modelu
       let gridHelper; // Dodajemy deklarację gridHelper
       let originalDimensions = { width: 0, height: 0, depth: 0 }; // Store original dimensions
+      let loadedFileNameBase = "model"; // Store the base name of the loaded file
 
       const dropzone = document.getElementById("dropzone");
       const fileInput = document.getElementById("file-input");
@@ -667,6 +668,7 @@
         if (e.dataTransfer.files.length > 0) {
           const file = e.dataTransfer.files[0];
           if (file.name.toLowerCase().endsWith(".stl")) {
+            loadedFileNameBase = file.name.replace(/\.stl$/i, ""); // Store base name
             loadSTL(file);
           } else {
             alert("Proszę wybrać plik STL");
@@ -682,6 +684,7 @@
         if (e.target.files.length > 0) {
           const file = e.target.files[0];
           if (file.name.toLowerCase().endsWith(".stl")) {
+            loadedFileNameBase = file.name.replace(/\.stl$/i, ""); // Store base name
             loadSTL(file);
           } else {
             alert("Proszę wybrać plik STL");
@@ -830,7 +833,7 @@
 
         const link = document.createElement("a");
         link.href = dataURL;
-        link.download = "model-stl.jpg";
+        link.download = `${loadedFileNameBase}.jpg`; // Use the stored base name
         link.click();
       });
 
