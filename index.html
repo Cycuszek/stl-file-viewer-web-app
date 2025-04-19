@@ -1130,6 +1130,7 @@
         .getElementById("load-preview-btn")
         .addEventListener("click", async (e) => {
           e.preventDefault(); // Prevent default link behavior
+          e.stopPropagation(); // Stop the event from bubbling up to the dropzone
           try {
             const response = await fetch("cyc_preview.stl");
             if (!response.ok) {
