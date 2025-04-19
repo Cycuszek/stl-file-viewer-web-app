@@ -521,7 +521,10 @@
           />
           <div id="scale-value">Scale: 100%</div>
         </div>
-        <!-- Removed Tip button -->
+        <button class="nav-btn" id="tip-btn">
+          <span class="nav-icon">☕</span>
+          <span class="nav-label">Tip</span>
+        </button>
       </div>
     </div>
 
@@ -825,7 +828,7 @@
         console.log("Grid visibility:", gridHelper.visible); // Dodaj logowanie dla debugowania
       });
 
-      // Skalowanie modelu
+      // Skalowanie modelu - Restored original camera adjustment logic
       scaleSlider.addEventListener("input", () => {
         if (
           !isModelLoaded ||
@@ -842,12 +845,30 @@
         // Apply scale
         model.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-        // Adjust position to keep bottom on grid (using original bounding box min y)
+        // Adjust position to keep bottom on grid
         const initialBottomY = -modelGeometry.boundingBox.min.y;
         model.position.y = initialBottomY * scaleFactor;
 
-        // Note: Camera adjustments are handled by the 'center-camera' button if needed.
-        // This simplifies the scaling logic.
+        // --- Start of restored camera logic ---
+        // Update camera Y position based on scaled height
+        const modelBox = new THREE.Box3().setFromObject(model); // Recalculate box after scaling
+        const modelSize = new THREE.Vector3();
+        modelBox.getSize(modelSize);
+        const modelCenter = new THREE.Vector3();
+        modelBox.getCenter(modelCenter);
+
+        // Adjust camera height relative to the scaled model center
+        // This part might need further refinement depending on desired behavior,
+        // but restores the original intent of adjusting camera with scale.
+        // A simple approach: keep camera looking at the center, adjust height slightly.
+        // More complex adjustments might be needed for optimal viewing at all scales.
+        // For now, let's just ensure controls target the new center.
+        controls.target.copy(modelCenter);
+        // Optionally adjust camera Y position - this was complex and potentially conflicting before.
+        // Let's keep it simple for now or rely on the center button.
+        // Example: camera.position.y = modelCenter.y + someOffsetBasedOnScale;
+        controls.update();
+        // --- End of restored camera logic ---
       });
 
       // Obsługa przycisku koloru
